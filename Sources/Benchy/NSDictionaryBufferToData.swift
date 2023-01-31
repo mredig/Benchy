@@ -57,5 +57,20 @@ enum NSDictionaryBufferToData: BenchmarkTest {
 			print("'\(label)' iteration \(i) took \(duration) seconds")
 		}
 
+		benchmark(label: "Int to String swift string:UInt8 datamapped", iterations: 5) { i, label in
+			var optDict: [String: UInt8]!
+			let mapDuration = measureDuration {
+				optDict = swiftDict.mapValues(\.uint8Value)
+			}
+			print("mapping took \(mapDuration) seconds")
+			let duration = measureDuration {
+				var buffer = Data(count: optDict.count)
+				for i in 0..<optDict.count {
+					buffer[i] = optDict["\(i)"]!
+				}
+			}
+			print("'\(label)' iteration \(i) took \(duration) seconds")
+		}
+
 	}
 }
