@@ -28,3 +28,7 @@ public func measureDuration(block: () -> Void) -> TimeInterval {
 
 	return duration
 }
+
+public protocol BenchmarkTest {
+	static func runBenchmarks() throws
+}
