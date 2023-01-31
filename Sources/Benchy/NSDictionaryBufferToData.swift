@@ -12,7 +12,7 @@ enum NSDictionaryBufferToData: BenchmarkTest {
 		let swiftAnyHashDict = nsDict as! [AnyHashable: NSNumber]
 		let swiftDict = nsDict as! [String: NSNumber]
 
-		benchmark(label: "swift string key dict Int to String", iterations: 5) { i, label in
+		benchmark(label: "Int to String swift string key dict", iterations: 5) { i, label in
 			let duration = measureDuration {
 				var buffer = Data()
 				for i in 0..<swiftDict.count {
@@ -22,7 +22,7 @@ enum NSDictionaryBufferToData: BenchmarkTest {
 			print("'\(label)' iteration \(i) took \(duration) seconds")
 		}
 
-		benchmark(label: "swift anyhash key dict Int to String", iterations: 5) { i, label in
+		benchmark(label: "Int to String swift anyhash key dict", iterations: 5) { i, label in
 			let duration = measureDuration {
 				var buffer = Data()
 				for i in 0..<swiftAnyHashDict.count {
@@ -32,7 +32,7 @@ enum NSDictionaryBufferToData: BenchmarkTest {
 			print("'\(label)' iteration \(i) took \(duration) seconds")
 		}
 
-		benchmark(label: "nsdict Int to String", iterations: 5) { i, label in
+		benchmark(label: "Int to String nsdict", iterations: 5) { i, label in
 			let duration = measureDuration {
 				var buffer = Data()
 				for i in 0..<nsDict.count {
@@ -42,7 +42,7 @@ enum NSDictionaryBufferToData: BenchmarkTest {
 			print("'\(label)' iteration \(i) took \(duration) seconds")
 		}
 
-		benchmark(label: "swift string:UInt8 Int to String", iterations: 5) { i, label in
+		benchmark(label: "Int to String swift string:UInt8", iterations: 5) { i, label in
 			var optDict: [String: UInt8]!
 			let mapDuration = measureDuration {
 				optDict = swiftDict.mapValues(\.uint8Value)
