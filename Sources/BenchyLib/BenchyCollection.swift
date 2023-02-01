@@ -35,7 +35,7 @@ public extension BenchyCollection {
 		}
 	}
 
-	static func addBenchmark(withLabel label: String, iterations: Int, printOutput: Bool, block: @escaping (Int, String) -> Void) {
+	static func addBenchmark(withLabel label: String, iterations: Int, printOutput: PrintSettings, block: @escaping (Int, String) -> Void) {
 		addBenchmark(Benchmark<Self>(
 			label: label,
 			iterations: iterations,

@@ -22,7 +22,8 @@ enum NSArrayBufferToData: BenchyCollection {
 
 		let nsarrayBuffer = ChildBenchmark(
 			label: "NSNumber NSArray buffer",
-			iterations: iterations) { i, label in
+			iterations: iterations,
+			printOutput: .all) { i, label in
 				var buffer = Data()
 				for i in 0..<nsArray.count {
 					buffer.append((nsArray[i] as! NSNumber).uint8Value)
@@ -31,7 +32,8 @@ enum NSArrayBufferToData: BenchyCollection {
 
 		let swiftArrayForCount = ChildBenchmark(
 			label: "NSNumber SwiftArray for-count buffer",
-			iterations: iterations) { i, label in
+			iterations: iterations,
+			printOutput: .all) { i, label in
 				var buffer = Data()
 				for i in 0..<swiftArray.count {
 					buffer.append(swiftArray[i].uint8Value)
@@ -41,7 +43,8 @@ enum NSArrayBufferToData: BenchyCollection {
 
 		let swiftArrayForIn = ChildBenchmark(
 			label: "NSNumber SwiftArray for-in buffer",
-			iterations: iterations)  { i, label in
+			iterations: iterations,
+			printOutput: .all) { i, label in
 				var buffer = Data()
 				for byte in swiftArray {
 					buffer.append(byte.uint8Value)
@@ -50,7 +53,8 @@ enum NSArrayBufferToData: BenchyCollection {
 
 		let swiftArrayForCountDataMapped = ChildBenchmark(
 			label: "NSNumber SwiftArray for-count buffer Data Mapped",
-			iterations: iterations) { i, label in
+			iterations: iterations,
+			printOutput: .all) { i, label in
 				var buffer = Data(count: swiftArray.count)
 				for i in swiftArray.startIndex..<swiftArray.endIndex {
 					buffer[i] = swiftArray[i].uint8Value
@@ -59,11 +63,51 @@ enum NSArrayBufferToData: BenchyCollection {
 
 		let swiftArrayForInEnumeratedBufferDataMapped = ChildBenchmark(
 			label: "NSNumber SwiftArray for-in enumerated buffer Data Mapped",
-			iterations: iterations) { i, label in
+			iterations: iterations,
+			printOutput: .all) { i, label in
 				var buffer = Data(count: swiftArray.count)
 				for (index, byte) in swiftArray.enumerated() {
 					buffer[index] = byte.uint8Value
 				}
+			}
+
+		let processorCount = ProcessInfo.processInfo.activeProcessorCount
+		let queue = OperationQueue()
+		queue.maxConcurrentOperationCount = processorCount
+
+		let swiftArrayForCountDataMappedMultiThread = ChildBenchmark(
+			label: "NSNumber SwiftArray for-count buffer Data Mapped Multithreaded",
+			iterations: iterations,
+			printOutput: .all) { i, label in
+
+				var ranges: [Range<Int>] = []
+				var previousEnd = 0
+				let delta = swiftArray.count / (processorCount * 4)
+				for checkpoint in stride(from: delta, through: swiftArray.endIndex, by: delta) {
+					defer { previousEnd = checkpoint }
+					let range = previousEnd..<min(checkpoint, swiftArray.endIndex)
+					ranges.append(range)
+				}
+				if ranges.last!.upperBound < swiftArray.endIndex {
+					ranges.append(previousEnd..<swiftArray.endIndex)
+				}
+
+				let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: swiftArray.count)
+				defer { buffer.deallocate() }
+
+				let tasks = ranges
+					.map { range in
+						BlockOperation {
+							for i in range {
+								buffer[i] = swiftArray[i].uint8Value
+							}
+						}
+					}
+
+				queue.addOperations(tasks, waitUntilFinished: true)
+
+				let data = Data(buffer: buffer)
+				print(data)
 			}
 
 		addBenchmarks([
@@ -72,6 +116,7 @@ enum NSArrayBufferToData: BenchyCollection {
 			swiftArrayForIn,
 			swiftArrayForCountDataMapped,
 			swiftArrayForInEnumeratedBufferDataMapped,
+			swiftArrayForCountDataMappedMultiThread
 		])
 
 	}
