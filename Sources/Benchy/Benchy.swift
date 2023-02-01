@@ -5,5 +5,6 @@ import BenchyLib
 struct Benchy {
 	static func main() async throws {
 		try NSDictionaryBufferToData.runBenchmarks()
+		displayResults()
 	}
 }
