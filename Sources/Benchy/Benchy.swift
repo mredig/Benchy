@@ -5,10 +5,10 @@ import BenchyLib
 struct BenchyExe {
 	static func main() async throws {
 //		Benchy.addBenchyTest(NSDictionaryBufferToData.self)
-		Benchy.addBenchyTest(NSArrayBufferToData.self)
+		try Benchy.addBenchyTest(NSArrayBufferToData.self)
 
 		try Benchy.runBenchmarks()
 
-		displayResults()
+		Benchy.displayResults()
 	}
 }
