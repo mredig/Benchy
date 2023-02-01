@@ -75,8 +75,8 @@ enum NSArrayBufferToData: BenchyCollection {
 		let queue = OperationQueue()
 		queue.maxConcurrentOperationCount = processorCount
 
-		let swiftArrayForCountDataMappedMultiThread = ChildBenchmark(
-			label: "NSNumber SwiftArray for-count buffer Data Mapped Multithreaded",
+		let swiftArrayRawBufferDataMappedMultiThreadOperation = ChildBenchmark(
+			label: "NSNumber SwiftArray raw buffer Data Mapped Multithreaded Operation",
 			iterations: iterations,
 			printOutput: .all) { i, label in
 
@@ -110,13 +110,45 @@ enum NSArrayBufferToData: BenchyCollection {
 				print(data)
 			}
 
+		let swiftArrayRawBufferDataMappedMultiThreadDQueue = ChildBenchmark(
+			label: "NSNumber SwiftArray raw buffer Data Mapped Multithreaded DGroup",
+			iterations: iterations,
+			printOutput: .all) { i, label in
+
+				var ranges: [Range<Int>] = []
+				var previousEnd = 0
+				let delta = swiftArray.count / (processorCount * 4)
+				for checkpoint in stride(from: delta, through: swiftArray.endIndex, by: delta) {
+					defer { previousEnd = checkpoint }
+					let range = previousEnd..<min(checkpoint, swiftArray.endIndex)
+					ranges.append(range)
+				}
+				if ranges.last!.upperBound < swiftArray.endIndex {
+					ranges.append(previousEnd..<swiftArray.endIndex)
+				}
+
+				let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: swiftArray.count)
+				defer { buffer.deallocate() }
+
+				DispatchQueue.concurrentPerform(iterations: ranges.count) { iteration in
+					let range = ranges[iteration]
+					for index in range {
+						buffer[index] = swiftArray[index].uint8Value
+					}
+				}
+
+				let data = Data(buffer: buffer)
+				print(data)
+			}
+
 		addBenchmarks([
 			nsarrayBuffer,
 			swiftArrayForCount,
 			swiftArrayForIn,
 			swiftArrayForCountDataMapped,
 			swiftArrayForInEnumeratedBufferDataMapped,
-			swiftArrayForCountDataMappedMultiThread
+			swiftArrayRawBufferDataMappedMultiThreadOperation,
+			swiftArrayRawBufferDataMappedMultiThreadDQueue,
 		])
 
 	}
