@@ -61,9 +61,6 @@ enum NSArrayBufferToData: BenchyCollection {
 			label: "NSNumber SwiftArray for-in enumerated buffer Data Mapped",
 			iterations: iterations) { i, label in
 				var buffer = Data(count: swiftArray.count)
-//					for i in swiftArray.startIndex..<swiftArray.endIndex {
-//						buffer[i] = swiftArray[i].uint8Value
-//					}
 				for (index, byte) in swiftArray.enumerated() {
 					buffer[index] = byte.uint8Value
 				}
