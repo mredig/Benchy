@@ -12,6 +12,20 @@ public struct ResultStats {
 }
 private var results: [String: ResultStats] = [:]
 
+public enum Benchy {
+	private static var benchmarks: [BenchyTest.Type] = []
+
+	public static func addBenchyTest(_ benchmark: BenchyTest.Type) {
+		benchmarks.append(benchmark)
+	}
+
+	public static func runBenchmarks() throws {
+		for benchmark in benchmarks {
+			try benchmark.runBenchmarks()
+		}
+	}
+}
+
 @discardableResult
 public func benchmark(label: String, iterations: Int = 1000, printOutput: Bool = true, block: (Int, String) -> TimeInterval) -> TimeInterval {
 	var times: [TimeInterval] = []

@@ -49,6 +49,32 @@ enum NSArrayBufferToData: BenchyTest {
 			}
 		}
 
+		benchmark(label: "NSNumber SwiftArray for-count buffer Data Mapped", iterations: iterations) { i, label in
+			measureDuration {
+				let duration = measureDuration {
+					var buffer = Data(count: swiftArray.count)
+					for i in swiftArray.startIndex..<swiftArray.endIndex {
+						buffer[i] = swiftArray[i].uint8Value
+					}
+				}
+				print("'\(label)' iteration \(i) took \(duration) seconds")
+			}
+		}
+
+		benchmark(label: "NSNumber SwiftArray for-in enumerated buffer Data Mapped", iterations: iterations) { i, label in
+			measureDuration {
+				let duration = measureDuration {
+					var buffer = Data(count: swiftArray.count)
+//					for i in swiftArray.startIndex..<swiftArray.endIndex {
+//						buffer[i] = swiftArray[i].uint8Value
+//					}
+					for (index, byte) in swiftArray.enumerated() {
+						buffer[index] = byte.uint8Value
+					}
+				}
+				print("'\(label)' iteration \(i) took \(duration) seconds")
+			}
+		}
 
 	}
 }

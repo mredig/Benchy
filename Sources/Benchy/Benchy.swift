@@ -2,10 +2,12 @@ import Foundation
 import BenchyLib
 
 @main
-struct Benchy {
+struct BenchyExe {
 	static func main() async throws {
-		try NSDictionaryBufferToData.runBenchmarks()
-		try NSArrayBufferToData.runBenchmarks()
+//		Benchy.addBenchyTest(NSDictionaryBufferToData.self)
+		Benchy.addBenchyTest(NSArrayBufferToData.self)
+
+		try Benchy.runBenchmarks()
 
 		displayResults()
 	}
