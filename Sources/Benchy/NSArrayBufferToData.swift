@@ -141,6 +141,53 @@ enum NSArrayBufferToData: BenchyCollection {
 				print(data)
 			}
 
+		let dispatchGroup = DispatchGroup()
+		let dispatchQueue = DispatchQueue(label: "Dataing", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .inherit)
+
+		let swiftArrayRawBufferDataMappedMultiThreadDispatchItems = ChildBenchmark(
+			label: "NSNumber SwiftArray raw buffer Data Mapped Multithreaded DispatchItems",
+			iterations: iterations,
+			printOutput: .all) { i, label in
+
+				var ranges: [Range<Int>] = []
+				var previousEnd = 0
+				let delta = swiftArray.count / (processorCount * 4)
+				for checkpoint in stride(from: delta, through: swiftArray.endIndex, by: delta) {
+					defer { previousEnd = checkpoint }
+					let range = previousEnd..<min(checkpoint, swiftArray.endIndex)
+					ranges.append(range)
+				}
+				if ranges.last!.upperBound < swiftArray.endIndex {
+					ranges.append(previousEnd..<swiftArray.endIndex)
+				}
+
+				let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: swiftArray.count)
+				defer { buffer.deallocate() }
+
+				let workItems = ranges
+					.map { range in
+						DispatchWorkItem(
+							qos: .userInitiated) {
+								print("Starting range: \(range)")
+								for index in range {
+									buffer[index] = swiftArray[index].uint8Value
+								}
+								print("Finished range: \(range)")
+							}
+					}
+
+				for workItem in workItems {
+					dispatchQueue.async(group: dispatchGroup, execute: workItem)
+				}
+
+				for workItem in workItems {
+					workItem.wait()
+				}
+
+				let data = Data(buffer: buffer)
+				print(data)
+			}
+
 		addBenchmarks([
 			nsarrayBuffer,
 			swiftArrayForCount,
@@ -149,6 +196,9 @@ enum NSArrayBufferToData: BenchyCollection {
 			swiftArrayForInEnumeratedBufferDataMapped,
 			swiftArrayRawBufferDataMappedMultiThreadOperation,
 			swiftArrayRawBufferDataMappedMultiThreadDQueue,
+			swiftArrayForInEnumeratedBufferRawDataMapped,
+			swiftArrayForInEnumeratedRawPointerDataMapped,
+			swiftArrayRawBufferDataMappedMultiThreadDispatchItems,
 		])
 
 	}
