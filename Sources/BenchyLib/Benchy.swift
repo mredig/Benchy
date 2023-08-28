@@ -6,7 +6,10 @@ public struct Benchy {
 
 	internal var results: [String: ResultStats] = [:]
 
-	public private(set) static var shared = Benchy()
+	public init(benchyCollection: [any BenchyComparator.Type] = [], results: [String : ResultStats] = [:]) {
+		self.benchyCollection = benchyCollection
+		self.results = results
+	}
 
 	public mutating func addBenchyTest(_ benchmark: any BenchyComparator.Type) throws {
 		guard
@@ -15,9 +18,6 @@ public struct Benchy {
 
 		benchyCollection.append(benchmark)
 		try benchmark.setupBenchmarks()
-	}
-	public static func addBenchyTest(_ benchmark: any BenchyComparator.Type) throws {
-		try shared.addBenchyTest(benchmark)
 	}
 
 	public mutating func runBenchmarks(cleanup: Bool = true) throws {
@@ -34,9 +34,6 @@ public struct Benchy {
 		if cleanup {
 			benchyCollection.removeAll()
 		}
-	}
-	public static func runBenchmarks(cleanup: Bool = true) throws {
-		try shared.runBenchmarks(cleanup: cleanup)
 	}
 
 	public mutating func displayResults(decimalCount: Int = 4, cleanup: Bool = false) {
@@ -72,9 +69,6 @@ public struct Benchy {
 		} catch {
 			print("Error creating table: \(error)")
 		}
-	}
-	public static func displayResults(decimalCount: Int = 4, cleanup: Bool = false) {
-		shared.displayResults(decimalCount: decimalCount, cleanup: cleanup)
 	}
 
 	enum BenchyError: Error {

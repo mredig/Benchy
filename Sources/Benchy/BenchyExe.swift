@@ -6,10 +6,11 @@ struct BenchyExe {
 	static func main() async throws {
 //		try Benchy.addBenchyTest(NSDictionaryBufferToData.self)
 //		try Benchy.addBenchyTest(NSArrayBufferToData.self)
-		try Benchy.addBenchyTest(DateVsCFAbsoluteTimeGetCurrent.self)
+		var benchy = Benchy()
+		try benchy.addBenchyTest(DateVsCFAbsoluteTimeGetCurrent.self)
 
-		try Benchy.runBenchmarks()
+		try benchy.runBenchmarks()
 
-		Benchy.displayResults(decimalCount: 10)
+		benchy.displayResults(decimalCount: 10)
 	}
 }
