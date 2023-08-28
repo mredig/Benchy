@@ -71,6 +71,43 @@ enum NSArrayBufferToData: BenchyCollection {
 				}
 			}
 
+		let swiftArrayForInEnumeratedBufferRawDataMapped = ChildBenchmark(
+			label: "NSNumber SwiftArray for-in enumerated raw unsafe buffer Data Mapped",
+			iterations: iterations,
+			printOutput: .all) { i, label in
+				let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: swiftArray.count)
+				defer { buffer.deallocate() }
+
+//				var buffer = Data(count: swiftArray.count)
+				for (index, byte) in swiftArray.enumerated() {
+					buffer[index] = byte.uint8Value
+				}
+
+				let data = Data(buffer: buffer)
+				print(data)
+			}
+
+		let swiftArrayForInEnumeratedRawPointerDataMapped = ChildBenchmark(
+			label: "NSNumber SwiftArray for-in enumerated raw unsafe pointer Data Mapped",
+			iterations: iterations,
+			printOutput: .all) { i, label in
+//				let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: swiftArray.count)
+				let pointer = UnsafeMutableRawPointer.allocate(byteCount: swiftArray.count, alignment: 8)
+//				defer { pointer.deallocate() }
+
+//				var buffer = Data(count: swiftArray.count)
+				for (index, byte) in swiftArray.enumerated() {
+//					buffer[index] = byte.uint8Value
+					pointer.storeBytes(of: byte.uint8Value, toByteOffset: index, as: UInt8.self)
+				}
+
+//				let data = Data(buffer: buffer)
+				let data = Data(bytesNoCopy: pointer, count: swiftArray.count, deallocator: .custom({ pointer, dno in
+					pointer.deallocate()
+				}))
+				print(data)
+			}
+
 		let processorCount = ProcessInfo.processInfo.activeProcessorCount
 		let queue = OperationQueue()
 		queue.maxConcurrentOperationCount = processorCount
@@ -189,15 +226,15 @@ enum NSArrayBufferToData: BenchyCollection {
 			}
 
 		addBenchmarks([
-			nsarrayBuffer,
-			swiftArrayForCount,
-			swiftArrayForIn,
+//			nsarrayBuffer,
+//			swiftArrayForCount,
+//			swiftArrayForIn,
 			swiftArrayForCountDataMapped,
 			swiftArrayForInEnumeratedBufferDataMapped,
-			swiftArrayRawBufferDataMappedMultiThreadOperation,
-			swiftArrayRawBufferDataMappedMultiThreadDQueue,
 			swiftArrayForInEnumeratedBufferRawDataMapped,
 			swiftArrayForInEnumeratedRawPointerDataMapped,
+//			swiftArrayRawBufferDataMappedMultiThreadOperation,
+//			swiftArrayRawBufferDataMappedMultiThreadDQueue,
 			swiftArrayRawBufferDataMappedMultiThreadDispatchItems,
 		])
 

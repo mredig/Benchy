@@ -64,13 +64,13 @@ public enum Benchy {
 }
 
 public func measureDuration(block: () -> Void) -> TimeInterval {
-	let start = Date()
+	let start = CFAbsoluteTimeGetCurrent()
 
 	block()
 
-	let end = Date()
+	let end = CFAbsoluteTimeGetCurrent()
 
-	let duration = end.timeIntervalSince(start)
+	let duration = end - start
 
 	return duration
 }
