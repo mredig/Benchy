@@ -15,23 +15,26 @@ public struct PrintSettings: OptionSet {
 	}
 }
 
-public struct Benchmark<TestParent: BenchyCollection> {
-
-	public init(label: String, iterations: Int, printOutput: PrintSettings = [.finalTotalTime, .metaData], block: @escaping (Int, String) -> Void, autotrack: Bool = false) {
-		self.label = label
-		self.iterations = iterations
-		self.printOutput = printOutput
-		self.block = block
-
-		if autotrack {
-			TestParent.addBenchmark(self)
-		}
-	}
-
+public struct Benchmark<TestParent: BenchyComparator> {
 	public let label: String
-	public let iterations: Int
+	public var iterations: Int { TestParent.iterations }
 	public let printOutput: PrintSettings
 	public let block: (Int, String) -> Void
+
+	@discardableResult
+	public init(
+		label: String,
+		printOutput: PrintSettings = [.finalTotalTime, .metaData],
+		block: @escaping (Int, String) -> Void,
+		autotrack: Bool = true) {
+			self.label = label
+			self.printOutput = printOutput
+			self.block = block
+
+			if autotrack {
+				TestParent.addBenchmark(self)
+			}
+		}
 
 	public func runBenchmark() throws -> ResultStats {
 		if printOutput.contains(.startMetaData) {
