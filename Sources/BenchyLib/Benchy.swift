@@ -2,37 +2,37 @@ import Foundation
 import Table
 
 public struct Benchy {
-	private var benchyCollection: [any BenchyComparator.Type] = []
+	private var benchyComparatorCollection: [any BenchyComparator.Type] = []
 
 	internal var results: [String: ResultStats] = [:]
 
-	public init(benchyCollection: [any BenchyComparator.Type] = [], results: [String : ResultStats] = [:]) {
-		self.benchyCollection = benchyCollection
+	public init(benchyComparatorCollection: [any BenchyComparator.Type] = [], results: [String : ResultStats] = [:]) {
+		self.benchyComparatorCollection = benchyComparatorCollection
 		self.results = results
 	}
 
 	public mutating func addBenchyTest(_ benchmark: any BenchyComparator.Type) throws {
 		guard
-			benchyCollection.contains(where: { $0.id == benchmark.id }) == false
+			benchyComparatorCollection.contains(where: { $0.id == benchmark.id }) == false
 		else { throw BenchyError.alreadyAddedCollection }
 
-		benchyCollection.append(benchmark)
+		benchyComparatorCollection.append(benchmark)
 		try benchmark.setupBenchmarks()
 	}
 
 	public mutating func runBenchmarks(cleanup: Bool = true) throws {
-		for collection in benchyCollection {
-			let results = try collection.runCollections()
+		for comparator in benchyComparatorCollection {
+			let results = try comparator.runCollections()
 			for result in results {
 				self.results[result.label] = result
 			}
 			if cleanup {
-				collection.cleanup()
+				comparator.cleanup()
 			}
 		}
 
 		if cleanup {
-			benchyCollection.removeAll()
+			benchyComparatorCollection.removeAll()
 		}
 	}
 
