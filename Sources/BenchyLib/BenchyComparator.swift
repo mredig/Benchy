@@ -47,11 +47,12 @@ public extension BenchyComparator {
 		}
 	}
 
-	static func addBenchmark(withLabel label: String, iterations: Int, printOutput: PrintSettings, block: @escaping (Int, String) -> Void) {
+	static func addBenchmark(withLabel label: String, printOutput: PrintSettings, block: @escaping (Int, String) -> Void) {
 		addBenchmark(Benchmark<Self>(
 			label: label,
 			printOutput: printOutput,
-			block: block))
+			block: block,
+			autotrack: false))
 	}
 
 	static func cleanup() {
