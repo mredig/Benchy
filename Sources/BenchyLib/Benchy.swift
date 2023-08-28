@@ -82,6 +82,7 @@ public struct Benchy {
 	}
 }
 
+@inlinable
 public func measureDuration(block: () -> Void) -> TimeInterval {
 	let start = CFAbsoluteTimeGetCurrent()
 
