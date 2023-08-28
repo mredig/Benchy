@@ -3,13 +3,21 @@ import Foundation
 public struct PrintSettings: OptionSet {
 	public var rawValue: UInt8 = 0
 
+	/// If `.iteration` is included, how often should iterations be printed to the console? Default: `100`
 	public var iterationFrequency = 100
 
+	/// Print out the total duration of all iterations of this benchmark. Does not compensate for printing updates to the
+	/// console, so if you have `.iteration` set, it is best to keep the frequency minimal to maintain accuracy.
 	public static let finalTotalTime = PrintSettings(rawValue: 1 << 1)
+	/// Every `iterationFrequency` iterations, prints out the iteration number and the duration of said iteration.
 	public static let iteration = PrintSettings(rawValue: 1 << 2)
+	/// Prints to the console when this benchmark is starting up.
 	public static let startMetaData = PrintSettings(rawValue: 1 << 3)
+	/// Prints to the console when this benchmark is finished.
 	public static let endMetaData = PrintSettings(rawValue: 1 << 4)
+	/// A convenient combination of `.startMetaData` and `.endMetaData`.
 	public static let metaData: PrintSettings = [.startMetaData, .endMetaData]
+	/// A convenient combination of every possible flag.
 	public static let all: PrintSettings = [.metaData, .iteration, .finalTotalTime]
 
 	public init(rawValue: UInt8) {
