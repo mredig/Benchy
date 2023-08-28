@@ -27,7 +27,7 @@ public enum Benchy {
 		benchyCollection.removeAll()
 	}
 
-	public static func displayResults() {
+	public static func displayResults(clearingResultsAfterwards: Bool = false) {
 		let sorted = results.sorted(by: {
 			$0.value.average < $1.value.average
 		})
@@ -55,6 +55,9 @@ public enum Benchy {
 		do {
 			let table = try Table(data: tableData).table()
 			print(table)
+			if clearingResultsAfterwards {
+				results.removeAll()
+			}
 		} catch {
 			print("Error creating table: \(error)")
 		}
