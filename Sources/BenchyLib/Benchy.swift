@@ -53,7 +53,6 @@ public struct Benchy {
 		numberFormatter.maximumFractionDigits = decimalCount
 
 		for (label, stats) in sorted {
-			//		print("\(label) took an average of \(stats.average) taking at most \(stats.max) and \(stats.min) at its fastest. There was a \(stats.max - stats.min) delta between the extremities. The median time was \(stats.median)")
 			tableData.append([
 				label,
 				numberFormatter.string(from: stats.average as NSNumber) ?? "nan",
