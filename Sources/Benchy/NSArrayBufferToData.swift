@@ -1,8 +1,9 @@
 import Foundation
 import BenchyLib
 
-enum NSArrayBufferToData: BenchyCollection {
+enum NSArrayBufferToData: BenchyComparator {
 	static var benchmarks: [Benchmark<NSArrayBufferToData>] = []
+	static var iterations: Int = 20
 
 	static var arrays: (nsArray: NSArray, swiftArray: [NSNumber]) = {
 		let fileURL = URL(filePath: "/Users/mredig/Swap/array.out")
@@ -18,11 +19,8 @@ enum NSArrayBufferToData: BenchyCollection {
 
 		let (nsArray, swiftArray) = arrays
 
-		let iterations = 20
-
-		let nsarrayBuffer = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber NSArray buffer",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 				var buffer = Data()
 				for i in 0..<nsArray.count {
@@ -30,9 +28,8 @@ enum NSArrayBufferToData: BenchyCollection {
 				}
 			}
 
-		let swiftArrayForCount = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber SwiftArray for-count buffer",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 				var buffer = Data()
 				for i in 0..<swiftArray.count {
@@ -41,9 +38,8 @@ enum NSArrayBufferToData: BenchyCollection {
 			}
 
 
-		let swiftArrayForIn = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber SwiftArray for-in buffer",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 				var buffer = Data()
 				for byte in swiftArray {
@@ -51,9 +47,8 @@ enum NSArrayBufferToData: BenchyCollection {
 				}
 			}
 
-		let swiftArrayForCountDataMapped = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber SwiftArray for-count buffer Data Mapped",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 				var buffer = Data(count: swiftArray.count)
 				for i in swiftArray.startIndex..<swiftArray.endIndex {
@@ -61,9 +56,8 @@ enum NSArrayBufferToData: BenchyCollection {
 				}
 			}
 
-		let swiftArrayForInEnumeratedBufferDataMapped = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber SwiftArray for-in enumerated buffer Data Mapped",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 				var buffer = Data(count: swiftArray.count)
 				for (index, byte) in swiftArray.enumerated() {
@@ -71,9 +65,8 @@ enum NSArrayBufferToData: BenchyCollection {
 				}
 			}
 
-		let swiftArrayForInEnumeratedBufferRawDataMapped = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber SwiftArray for-in enumerated raw unsafe buffer Data Mapped",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 				let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: swiftArray.count)
 				defer { buffer.deallocate() }
@@ -87,9 +80,8 @@ enum NSArrayBufferToData: BenchyCollection {
 				print(data)
 			}
 
-		let swiftArrayForInEnumeratedRawPointerDataMapped = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber SwiftArray for-in enumerated raw unsafe pointer Data Mapped",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 //				let buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: swiftArray.count)
 				let pointer = UnsafeMutableRawPointer.allocate(byteCount: swiftArray.count, alignment: 8)
@@ -112,9 +104,8 @@ enum NSArrayBufferToData: BenchyCollection {
 		let queue = OperationQueue()
 		queue.maxConcurrentOperationCount = processorCount
 
-		let swiftArrayRawBufferDataMappedMultiThreadOperation = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber SwiftArray raw buffer Data Mapped Multithreaded Operation",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 
 				var ranges: [Range<Int>] = []
@@ -147,9 +138,8 @@ enum NSArrayBufferToData: BenchyCollection {
 				print(data)
 			}
 
-		let swiftArrayRawBufferDataMappedMultiThreadDQueue = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber SwiftArray raw buffer Data Mapped Multithreaded DGroup",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 
 				var ranges: [Range<Int>] = []
@@ -181,9 +171,8 @@ enum NSArrayBufferToData: BenchyCollection {
 		let dispatchGroup = DispatchGroup()
 		let dispatchQueue = DispatchQueue(label: "Dataing", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .inherit)
 
-		let swiftArrayRawBufferDataMappedMultiThreadDispatchItems = ChildBenchmark(
+		ChildBenchmark(
 			label: "NSNumber SwiftArray raw buffer Data Mapped Multithreaded DispatchItems",
-			iterations: iterations,
 			printOutput: .all) { i, label in
 
 				var ranges: [Range<Int>] = []
@@ -224,19 +213,5 @@ enum NSArrayBufferToData: BenchyCollection {
 				let data = Data(buffer: buffer)
 				print(data)
 			}
-
-		addBenchmarks([
-//			nsarrayBuffer,
-//			swiftArrayForCount,
-//			swiftArrayForIn,
-			swiftArrayForCountDataMapped,
-			swiftArrayForInEnumeratedBufferDataMapped,
-			swiftArrayForInEnumeratedBufferRawDataMapped,
-			swiftArrayForInEnumeratedRawPointerDataMapped,
-//			swiftArrayRawBufferDataMappedMultiThreadOperation,
-//			swiftArrayRawBufferDataMappedMultiThreadDQueue,
-			swiftArrayRawBufferDataMappedMultiThreadDispatchItems,
-		])
-
 	}
 }
