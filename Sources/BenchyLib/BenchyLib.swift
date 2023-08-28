@@ -23,6 +23,8 @@ public enum Benchy {
 				self.results[result.label] = result
 			}
 		}
+
+		benchyCollection.removeAll()
 	}
 
 	public static func displayResults() {
