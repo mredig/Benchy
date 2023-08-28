@@ -3,6 +3,8 @@ import Foundation
 public struct PrintSettings: OptionSet {
 	public var rawValue: UInt8 = 0
 
+	public var iterationFrequency = 100
+
 	public static let finalTotalTime = PrintSettings(rawValue: 1 << 1)
 	public static let iteration = PrintSettings(rawValue: 1 << 2)
 	public static let startMetaData = PrintSettings(rawValue: 1 << 3)
@@ -57,7 +59,7 @@ public struct Benchmark<TestParent: BenchyComparator> {
 						block(i, label)
 					}
 					times.append(time)
-					if printOutput.contains(.iteration) {
+					if printOutput.contains(.iteration), i.isMultiple(of: printOutput.iterationFrequency) {
 						print("'\(label)' iteration \(i) took \(time) seconds")
 					}
 				}
