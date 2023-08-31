@@ -47,7 +47,10 @@ public extension BenchyComparator {
 		}
 	}
 
-	static func addBenchmark(withLabel label: String, printOutput: PrintSettings, block: @escaping (Int, String) -> Void) {
+	static func addBenchmark(
+		withLabel label: String,
+		printOutput: PrintSettings = [.finalTotalTime, .metaData],
+		block: @escaping (Int, String) -> Void) {
 		addBenchmark(Benchmark<Self>(
 			label: label,
 			printOutput: printOutput,

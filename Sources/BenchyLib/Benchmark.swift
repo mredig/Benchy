@@ -60,6 +60,12 @@ public struct Benchmark<TestParent: BenchyComparator> {
 			}
 		}
 		var times: [TimeInterval] = []
+		if 
+			TestParent.self == DefaultBenchyComparator.self,
+			TestParent.iterations == 1 {
+
+			print("🧡🧡🧡 Warning! Only 1 iteration on DefaultBenchyComparator! 🧡🧡🧡 ")
+		}
 		let duration = measureDuration {
 			for i in 1...iterations {
 				autoreleasepool {
